@@ -27,13 +27,17 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Generate version (yyyyMMddHHmmss)
+        id: version
+        run: echo "value=$(TZ=Asia/Shanghai date +'%Y%m%d%H%M%S')" >> "$GITHUB_OUTPUT"
+
       - name: Extract metadata (tags, labels)
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=sha
+            type=raw,value=${{ steps.version.outputs.value }}
             type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and push
